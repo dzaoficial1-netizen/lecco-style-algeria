@@ -84,10 +84,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "LECCO Clothes — Premium Menswear · Algiers" },
       { name: "description", content: "LECCO Clothes — premium streetwear and tailored menswear from Algiers. Engineered for the modern silhouette." },
       { name: "author", content: "LECCO Clothes" },
-      { property: "og:title", content: "LECCO Clothes — Premium Menswear" },
-      { property: "og:description", content: "Premium streetwear and tailored menswear from Algiers." },
+      { property: "og:title", content: "LECCO Clothes — Premium Menswear · Algiers" },
+      { property: "og:description", content: "LECCO Clothes — premium streetwear and tailored menswear from Algiers. Engineered for the modern silhouette." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "LECCO Clothes — Premium Menswear · Algiers" },
+      { name: "twitter:description", content: "LECCO Clothes — premium streetwear and tailored menswear from Algiers. Engineered for the modern silhouette." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bf75ffd4-fae9-4629-89d1-a7fb88eb9235/id-preview-f14d052d--a51dfbee-8b61-415c-9880-4f9222f756a5.lovable.app-1780671647758.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/bf75ffd4-fae9-4629-89d1-a7fb88eb9235/id-preview-f14d052d--a51dfbee-8b61-415c-9880-4f9222f756a5.lovable.app-1780671647758.png" },
     ],
     links: [
       {
