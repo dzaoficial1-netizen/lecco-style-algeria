@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Header } from "../components/layout/Header";
+import { Footer } from "../components/layout/Footer";
+import { FloatingAction } from "../components/layout/FloatingAction";
+import { CartDrawer } from "../components/layout/CartDrawer";
 
 function NotFoundComponent() {
   return (
@@ -77,14 +81,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "LECCO Clothes — Premium Menswear · Algiers" },
+      { name: "description", content: "LECCO Clothes — premium streetwear and tailored menswear from Algiers. Engineered for the modern silhouette." },
+      { name: "author", content: "LECCO Clothes" },
+      { property: "og:title", content: "LECCO Clothes — Premium Menswear" },
+      { property: "og:description", content: "Premium streetwear and tailored menswear from Algiers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -118,8 +121,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <Header />
+      <main className="min-h-screen">
+        <Outlet />
+      </main>
+      <Footer />
+      <FloatingAction />
+      <CartDrawer />
     </QueryClientProvider>
   );
 }
