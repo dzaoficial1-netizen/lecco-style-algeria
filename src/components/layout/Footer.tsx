@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 export function Footer() {
   return (
@@ -10,9 +10,10 @@ export function Footer() {
           <p className="mt-4 max-w-xs text-paper/60 text-sm">
             Premium menswear from Algiers. Engineered for the modern silhouette.
           </p>
-          <div className="flex gap-3 mt-6">
-            <a href="#" aria-label="Instagram" className="p-2 border border-paper/20 hover:border-brand hover:text-brand"><Instagram size={16} /></a>
-            <a href="#" aria-label="Facebook" className="p-2 border border-paper/20 hover:border-brand hover:text-brand"><Facebook size={16} /></a>
+          <div className="flex gap-2 mt-6 eyebrow">
+            <a href="#" aria-label="Instagram" className="px-3 py-2 border border-paper/20 hover:border-brand hover:text-brand">IG</a>
+            <a href="#" aria-label="Facebook" className="px-3 py-2 border border-paper/20 hover:border-brand hover:text-brand">FB</a>
+            <a href="#" aria-label="TikTok" className="px-3 py-2 border border-paper/20 hover:border-brand hover:text-brand">TT</a>
           </div>
         </div>
         <div>
