@@ -69,7 +69,7 @@ function ProductPage() {
           <div className="mt-8">
             <p className="eyebrow mb-3">Color · <span className="text-muted-foreground">{color}</span></p>
             <div className="flex gap-2">
-              {p.colors.map(c => (
+              {p.colors.map((c: string) => (
                 <button key={c} onClick={()=>setColor(c)} aria-label={c}
                   style={{ background: c }}
                   className={clsx("w-9 h-9 rounded-full border-2", color===c ? "border-brand" : "border-border")} />
@@ -80,7 +80,7 @@ function ProductPage() {
           <div className="mt-6">
             <p className="eyebrow mb-3">Size</p>
             <div className="flex flex-wrap gap-2">
-              {p.sizes.map(s => (
+              {p.sizes.map((s: string) => (
                 <button key={s} onClick={()=>setSize(s)}
                   className={clsx("min-w-12 px-3 py-2.5 border text-sm", size===s ? "border-ink bg-ink text-paper" : "border-border hover:border-ink")}>
                   {s}
