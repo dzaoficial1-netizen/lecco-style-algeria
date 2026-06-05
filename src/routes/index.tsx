@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, type Variants } from "framer-motion";
 import { useRef } from "react";
 import hero from "@/assets/hero.jpg";
 import editorial1 from "@/assets/editorial-1.jpg";
@@ -44,14 +44,14 @@ function Index() {
   const { scrollYProgress: marP } = useScroll({ target: marqueeRef, offset: ["start end", "end start"] });
   const marX = useSpring(useTransform(marP, [0, 1], ["10%", "-40%"]), { stiffness: 80, damping: 20 });
 
-  const reveal = {
+  const reveal: Variants = {
     hidden: { opacity: 0, y: 60 },
     show: (i = 0) => ({
       opacity: 1,
       y: 0,
-      transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: i * 0.08 },
+      transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1] as const, delay: i * 0.08 },
     }),
-  } as const;
+  };
 
   return (
     <>
