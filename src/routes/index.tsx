@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion, useScroll, useTransform, useSpring, type Variants } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue, useMotionTemplate, type Variants } from "framer-motion";
 import { useRef } from "react";
 import hero from "@/assets/hero.jpg";
 import editorial1 from "@/assets/editorial-1.jpg";
@@ -30,6 +30,13 @@ function Index() {
   const heroTextY = useTransform(heroP, [0, 1], ["0%", "-40%"]);
   const heroOpacity = useTransform(heroP, [0, 0.8], [1, 0]);
 
+  // cursor-following spotlight on hero
+  const mx = useMotionValue(50);
+  const my = useMotionValue(50);
+  const sx = useSpring(mx, { stiffness: 120, damping: 20 });
+  const sy = useSpring(my, { stiffness: 120, damping: 20 });
+  const spotlight = useMotionTemplate`radial-gradient(600px circle at ${sx}% ${sy}%, rgba(232,25,44,0.25), transparent 60%)`;
+
   const manifestoRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: manP } = useScroll({ target: manifestoRef, offset: ["start end", "end start"] });
   const manImgY = useTransform(manP, [0, 1], ["-10%", "10%"]);
@@ -40,10 +47,6 @@ function Index() {
   const banY = useTransform(banP, [0, 1], ["-15%", "15%"]);
   const banTextX = useTransform(banP, [0, 1], ["-10%", "10%"]);
 
-  const marqueeRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: marP } = useScroll({ target: marqueeRef, offset: ["start end", "end start"] });
-  const marX = useSpring(useTransform(marP, [0, 1], ["10%", "-40%"]), { stiffness: 80, damping: 20 });
-
   const reveal: Variants = {
     hidden: { opacity: 0, y: 60 },
     show: (i = 0) => ({
@@ -53,10 +56,24 @@ function Index() {
     }),
   };
 
+  const heroLines: { text: string; accent?: string }[] = [
+    { text: "Engineered" },
+    { text: "for the" },
+    { text: "modern silhouette.", accent: "modern" },
+  ];
+
   return (
     <>
       {/* HERO */}
-      <section ref={heroRef} className="relative h-screen min-h-[640px] w-full overflow-hidden bg-ink text-paper">
+      <section
+        ref={heroRef}
+        onMouseMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          mx.set(((e.clientX - r.left) / r.width) * 100);
+          my.set(((e.clientY - r.top) / r.height) * 100);
+        }}
+        className="relative h-screen min-h-[640px] w-full overflow-hidden bg-ink text-paper"
+      >
         <motion.img
           src={hero}
           alt=""
@@ -64,6 +81,8 @@ function Index() {
           className="absolute inset-0 w-full h-[120%] object-cover object-center opacity-90 will-change-transform"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/10 to-ink/80" />
+        <motion.div style={{ background: spotlight }} className="absolute inset-0 pointer-events-none mix-blend-screen" />
+        <div className="noise-overlay" />
         <motion.div
           style={{ y: heroTextY, opacity: heroOpacity }}
           className="container-edge relative z-10 h-full flex flex-col justify-end pb-16 md:pb-24"
@@ -76,19 +95,26 @@ function Index() {
           >
             FW / 26 · Drop 01
           </motion.p>
-          <h1 className="display-hero text-6xl sm:text-8xl md:text-[10rem] max-w-4xl overflow-hidden">
-            {["Engineered", "for the", "modern silhouette."].map((line, i) => (
-              <motion.span
-                key={i}
-                initial={{ y: "110%" }}
-                animate={{ y: "0%" }}
-                transition={{ duration: 1.1, delay: 0.3 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                className="block"
-              >
-                {i === 2 ? (
-                  <><span className="text-brand">modern</span> silhouette.</>
-                ) : line}
-              </motion.span>
+          <h1 className="display-hero text-6xl sm:text-8xl md:text-[10rem] max-w-4xl">
+            {heroLines.map((line, i) => (
+              <span key={i} className="block overflow-hidden">
+                <motion.span
+                  initial={{ y: "110%", rotate: 6 }}
+                  animate={{ y: "0%", rotate: 0 }}
+                  transition={{ duration: 1.2, delay: 0.3 + i * 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="block origin-bottom-left"
+                >
+                  {line.accent
+                    ? line.text.split(" ").map((w, j) =>
+                        w === line.accent ? (
+                          <span key={j} className="text-brand italic">{w} </span>
+                        ) : (
+                          <span key={j}>{w} </span>
+                        ),
+                      )
+                    : line.text}
+                </motion.span>
+              </span>
             ))}
           </h1>
           <motion.div
@@ -120,15 +146,19 @@ function Index() {
         </motion.div>
       </section>
 
-      {/* MARQUEE */}
-      <div ref={marqueeRef} className="bg-ink text-paper py-6 overflow-hidden border-y border-paper/10">
-        <motion.div style={{ x: marX }} className="flex gap-12 whitespace-nowrap font-display text-4xl md:text-6xl italic">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span key={i} className="flex items-center gap-12">
-              FW/26 DROP <span className="text-brand">●</span> ALGIERS ORIGIN <span className="text-gold">●</span> COD AVAILABLE <span className="text-brand">●</span>
-            </span>
+      {/* MARQUEE — true infinite loop */}
+      <div className="bg-ink text-paper py-7 overflow-hidden border-y border-paper/10">
+        <div className="marquee-track flex gap-12 whitespace-nowrap font-display text-4xl md:text-6xl italic w-max">
+          {Array.from({ length: 2 }).map((_, k) => (
+            <div key={k} className="flex gap-12 items-center pr-12">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <span key={i} className="flex items-center gap-12">
+                  FW/26 DROP <span className="text-brand">●</span> ALGIERS ORIGIN <span className="text-gold">●</span> COD AVAILABLE <span className="text-brand">●</span>
+                </span>
+              ))}
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       {/* CATEGORY GRID */}

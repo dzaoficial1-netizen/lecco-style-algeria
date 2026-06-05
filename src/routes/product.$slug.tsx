@@ -5,6 +5,8 @@ import { useCart, useWishlist, useHydrated } from "@/lib/store";
 import { formatDZD } from "@/lib/format";
 import { Heart, ShoppingBag, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { ProductCard } from "@/components/product/ProductCard";
+import { Product3DViewer } from "@/components/product/Product3DViewer";
+import { motion } from "framer-motion";
 import clsx from "clsx";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -61,9 +63,18 @@ function ProductPage() {
           </Link>
           <h1 className="font-display text-5xl md:text-6xl mt-3">{p.name}</h1>
           {p.tagline && <p className="text-muted-foreground mt-2">{p.tagline}</p>}
-          <div className="flex items-baseline gap-3 mt-5">
-            <p className="font-display text-3xl">{formatDZD(p.price)}</p>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="flex items-baseline gap-3 mt-5"
+          >
+            <p className="font-display text-4xl">{formatDZD(p.price)}</p>
             {p.compareAt && <p className="text-muted-foreground line-through">{formatDZD(p.compareAt)}</p>}
+          </motion.div>
+
+          <div className="mt-6">
+            <Product3DViewer p={p} color={color} />
           </div>
 
           <div className="mt-8">
