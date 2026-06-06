@@ -1,43 +1,47 @@
 import { Link } from "@tanstack/react-router";
 import { Heart } from "lucide-react";
-import type { Product } from "@/lib/products";
+import type { DBProduct } from "@/lib/products";
+import { productImage } from "@/lib/products";
 import { useWishlist, useHydrated } from "@/lib/store";
 import { formatDZD } from "@/lib/format";
 import clsx from "clsx";
 
-export function ProductCard({ p }: { p: Product }) {
+export function ProductCard({ p }: { p: DBProduct }) {
   const toggle = useWishlist((s) => s.toggle);
   const has = useWishlist((s) => s.ids.includes(p.id));
   const hydrated = useHydrated();
+  const img = productImage(p);
+  const compareAt = p.compare_at_price ?? null;
 
   return (
     <div className="group relative">
       <Link to="/product/$slug" params={{ slug: p.slug }} className="block">
         <div className="relative aspect-[4/5] bg-secondary overflow-hidden">
           <img
-            src={p.image}
-            alt={p.name}
+            src={img}
+            alt={p.title}
             loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <div className="absolute top-3 left-3 flex flex-col gap-1">
-            {p.isNew && <span className="bg-ink text-paper eyebrow px-2 py-1">New</span>}
-            {p.compareAt && (
+            {p.is_new && <span className="bg-ink text-paper eyebrow px-2 py-1">New</span>}
+            {compareAt && (
               <span className="bg-brand text-paper eyebrow px-2 py-1">
-                -{Math.round((1 - p.price / p.compareAt) * 100)}%
+                -{Math.round((1 - p.price / compareAt) * 100)}%
               </span>
             )}
           </div>
         </div>
         <div className="pt-3 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="font-display text-lg leading-tight truncate">{p.name}</p>
+            <p className="font-display text-lg leading-tight truncate">{p.title}</p>
             {p.tagline && <p className="text-xs text-muted-foreground mt-0.5 truncate">{p.tagline}</p>}
           </div>
           <div className="text-right shrink-0">
             <p className="font-display text-lg">{formatDZD(p.price)}</p>
-            {p.compareAt && (
-              <p className="text-xs text-muted-foreground line-through">{formatDZD(p.compareAt)}</p>
+            {compareAt && (
+              <p className="text-xs text-muted-foreground line-through">{formatDZD(compareAt)}</p>
             )}
           </div>
         </div>
