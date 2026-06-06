@@ -2,9 +2,13 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Float, ContactShadows, Environment, Html } from "@react-three/drei";
 import * as THREE from "three";
-import type { Product } from "@/lib/products";
 
-function Shape({ p, hex }: { p: Product; hex: string }) {
+interface ViewerProduct {
+  category: string;
+  colors: string[];
+}
+
+function Shape({ p, hex }: { p: ViewerProduct; hex: string }) {
   const ref = useRef<THREE.Mesh>(null);
   useFrame((_, dt) => {
     if (ref.current) ref.current.rotation.y += dt * 0.15;
