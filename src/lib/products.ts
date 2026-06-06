@@ -36,6 +36,54 @@ export const CATEGORIES: { slug: Category; label: string; image: string }[] = [
   { slug: "hats",     label: "Caps",     image: hats },
 ];
 
+/** Fallback image for any category — used when a DB product has no image_urls. */
+export function categoryImage(cat: string): string {
+  return CATEGORIES.find((c) => c.slug === cat)?.image ?? tshirts;
+}
+
+/** Row shape returned by the products server functions. */
+export interface DBProduct {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  category: string;
+  price: number;
+  compare_at_price: number | null;
+  stock: number;
+  image_urls: string[];
+  colors: string[];
+  sizes: string[];
+  tagline: string | null;
+  is_new: boolean;
+  is_active: boolean;
+}
+
+/** Resolve the primary image for a DB product (fallback to category image). */
+export function productImage(p: Pick<DBProduct, "image_urls" | "category">): string {
+  return p.image_urls?.[0] ?? categoryImage(p.category);
+}
+
+/** Adapt a legacy mock `Product` into the `DBProduct` shape used by ProductCard. */
+export function toDBProduct(p: Product): DBProduct {
+  return {
+    id: p.id,
+    slug: p.slug,
+    title: p.name,
+    description: null,
+    category: p.category,
+    price: p.price,
+    compare_at_price: p.compareAt ?? null,
+    stock: 99,
+    image_urls: [p.image],
+    colors: p.colors,
+    sizes: p.sizes,
+    tagline: p.tagline ?? null,
+    is_new: !!p.isNew,
+    is_active: true,
+  };
+}
+
 const APPAREL_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const SHOE_SIZES = ["40", "41", "42", "43", "44", "45"];
 const HAT_SIZE = ["One Size"];

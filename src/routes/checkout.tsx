@@ -6,7 +6,10 @@ import { z } from "zod";
 import { WILAYAS } from "@/lib/wilayas";
 import { useCart, useHydrated } from "@/lib/store";
 import { formatDZD } from "@/lib/format";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { createOrder } from "@/lib/orders.functions";
+import { buildWhatsAppOrderUrl } from "@/lib/whatsapp";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -36,16 +39,62 @@ function CheckoutPage() {
   const { lines, total, clear } = useCart();
   const hydrated = useHydrated();
   const nav = useNavigate();
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState<null | { orderNumber: string; waUrl: string }>(null);
+  const [submitting, setSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<FormVals>({
     resolver: zodResolver(Schema),
     defaultValues: { delivery: "home" },
   });
 
-  const onSubmit = (v: FormVals) => {
-    console.log("ORDER", { customer: v, lines, total: total() });
-    clear();
-    setDone(true);
+  const onSubmit = async (v: FormVals) => {
+    setSubmitting(true);
+    const shipping = v.delivery === "home" ? 600 : 400;
+    try {
+      const items = lines.map((l) => ({
+        product_id: l.product.id,
+        slug: l.product.slug,
+        name: l.product.name,
+        size: l.size,
+        color: l.color,
+        qty: l.qty,
+        unit_price: l.product.price,
+      }));
+      const order = await createOrder({
+        data: {
+          customer_name: v.fullName,
+          customer_phone: `+213${v.phone.replace(/\s/g, "")}`,
+          customer_email: v.email || "",
+          wilaya: v.wilaya,
+          address: `${v.address}, ${v.city}`,
+          notes: v.notes || "",
+          shipping,
+          items,
+        },
+      });
+      const waUrl = buildWhatsAppOrderUrl({
+        orderNumber: order.order_number,
+        customerName: v.fullName,
+        customerPhone: `+213${v.phone.replace(/\s/g, "")}`,
+        wilaya: v.wilaya,
+        address: `${v.address}, ${v.city}`,
+        notes: v.notes,
+        items: lines.map((l) => ({
+          name: l.product.name, size: l.size, color: l.color, qty: l.qty, price: l.product.price,
+        })),
+        subtotal: order.subtotal,
+        shipping: order.shipping,
+        total: order.total,
+      });
+      clear();
+      setDone({ orderNumber: order.order_number, waUrl });
+      // Open WhatsApp in a new tab so the customer can also confirm directly.
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Order failed";
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (done) {
@@ -53,8 +102,12 @@ function CheckoutPage() {
       <div className="pt-40 pb-24 container-edge text-center max-w-lg mx-auto">
         <CheckCircle2 size={56} className="mx-auto text-brand" />
         <h1 className="font-display text-5xl mt-6">Order Confirmed</h1>
-        <p className="text-muted-foreground mt-3">We'll WhatsApp you shortly to confirm delivery details.</p>
-        <Link to="/" className="inline-block mt-8 bg-ink text-paper px-6 py-3 eyebrow hover:bg-brand">Back to Home</Link>
+        <p className="font-display text-2xl mt-3">#{done.orderNumber}</p>
+        <p className="text-muted-foreground mt-3">We'll WhatsApp you shortly to confirm delivery. If WhatsApp didn't open automatically, tap the button below.</p>
+        <div className="mt-8 flex flex-wrap gap-3 justify-center">
+          <a href={done.waUrl} target="_blank" rel="noopener noreferrer" className="bg-brand text-paper px-6 py-3 eyebrow hover:opacity-90">Open WhatsApp</a>
+          <Link to="/" className="border border-ink text-ink px-6 py-3 eyebrow hover:bg-ink hover:text-paper">Back to Home</Link>
+        </div>
       </div>
     );
   }
@@ -137,8 +190,9 @@ function CheckoutPage() {
             </div>
           </section>
 
-          <button type="submit" className="w-full md:w-auto md:px-12 bg-ink text-paper py-4 eyebrow hover:bg-brand transition-colors">
-            Place Order · Cash on Delivery
+          <button type="submit" disabled={submitting} className="w-full md:w-auto md:px-12 bg-ink text-paper py-4 eyebrow hover:bg-brand transition-colors inline-flex items-center justify-center gap-2 disabled:opacity-60">
+            {submitting && <Loader2 size={16} className="animate-spin" />}
+            {submitting ? "Placing Order…" : "Place Order · Cash on Delivery"}
           </button>
         </form>
 

@@ -6,7 +6,7 @@ import { useRef } from "react";
 import hero from "@/assets/hero.jpg";
 import editorial1 from "@/assets/editorial-1.jpg";
 import editorial2 from "@/assets/editorial-2.jpg";
-import { CATEGORIES, featured } from "@/lib/products";
+import { CATEGORIES, featured, toDBProduct } from "@/lib/products";
 import { ProductCard } from "@/components/product/ProductCard";
 
 export const Route = createFileRoute("/")({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const drop = featured();
+  const drop = featured().map(toDBProduct);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroP } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(heroP, [0, 1], ["0%", "30%"]);
