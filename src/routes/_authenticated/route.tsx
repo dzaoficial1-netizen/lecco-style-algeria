@@ -1,7 +1,8 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { isAdmin } from "@/lib/admin.functions";
+import { isAdmin, claimAdminIfFirst } from "@/lib/admin.functions";
+import { useEffect } from "react";
 import { LogOut, LayoutDashboard, Package, ShoppingCart } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -16,10 +17,17 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AdminShell() {
   const nav = useNavigate();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["is-admin"],
     queryFn: () => isAdmin(),
   });
+
+  // Bootstrap: first signed-in user becomes admin if no admin exists yet.
+  useEffect(() => {
+    if (isLoading) return;
+    if (data?.isAdmin) return;
+    claimAdminIfFirst().then((r) => { if (r.claimed) refetch(); }).catch(() => {});
+  }, [data, isLoading, refetch]);
 
   async function signOut() {
     await supabase.auth.signOut();
