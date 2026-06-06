@@ -68,7 +68,7 @@ function Shape({ p, hex }: { p: ViewerProduct; hex: string }) {
   );
 }
 
-export function Product3DViewer({ p, color }: { p: Product; color: string }) {
+export function Product3DViewer({ p, color }: { p: ViewerProduct; color: string }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
