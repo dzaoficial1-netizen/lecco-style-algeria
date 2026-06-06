@@ -33,7 +33,7 @@ function AdminProducts() {
           <p className="eyebrow text-muted-foreground">Catalog</p>
           <h1 className="font-display text-4xl mt-2">Products</h1>
         </div>
-        <button onClick={() => setEditing({ category: "t-shirts", price: 0, stock: 0, sizes: [], colors: [], image_urls: [], is_active: true, is_new: false })} className="bg-ink text-paper px-4 py-2.5 eyebrow inline-flex items-center gap-2 hover:bg-brand">
+        <button onClick={() => setEditing({ category: "t-shirts", price: 0, stock: 0, image_urls: [], is_active: true, is_new: false } as Partial<Row>)} className="bg-ink text-paper px-4 py-2.5 eyebrow inline-flex items-center gap-2 hover:bg-brand">
           <Plus size={14} /> New
         </button>
       </div>
