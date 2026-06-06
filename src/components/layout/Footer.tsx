@@ -38,7 +38,7 @@ export function Footer() {
           <p className="eyebrow text-paper/50 mb-4">Contact</p>
           <ul className="space-y-2 text-sm">
             <li className="flex items-center gap-2"><Mail size={14} /><span>anesmokhati@gmail.com</span></li>
-            <li className="flex items-center gap-2"><Phone size={14} /> +213 776 897 923</li>
+            <li className="flex items-center gap-2"><Phone size={14} /><span>+213 776 897 923</span></li>
             <li className="text-paper/60">Algiers, Algeria</li>
           </ul>
         </div>
