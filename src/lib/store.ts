@@ -1,6 +1,14 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { Product } from "./products";
+
+/** Minimal product shape stored in the cart — works for both DB and mock products. */
+export interface CartProduct {
+  id: string;
+  slug: string;
+  name: string;
+  image: string;
+  price: number;
+}
 
 const safeStorage = createJSONStorage(() =>
   typeof window !== "undefined"
@@ -10,7 +18,7 @@ const safeStorage = createJSONStorage(() =>
 
 export interface CartLine {
   id: string;            // product.id + size + color
-  product: Product;
+  product: CartProduct;
   size: string;
   color: string;
   qty: number;
@@ -20,7 +28,7 @@ interface CartState {
   lines: CartLine[];
   open: boolean;
   setOpen: (v: boolean) => void;
-  add: (p: Product, size: string, color: string, qty?: number) => void;
+  add: (p: CartProduct, size: string, color: string, qty?: number) => void;
   remove: (id: string) => void;
   setQty: (id: string, qty: number) => void;
   clear: () => void;
