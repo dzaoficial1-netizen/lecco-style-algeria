@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PRODUCTS } from "@/lib/products";
+import { PRODUCTS, toDBProduct } from "@/lib/products";
 import { useWishlist, useHydrated } from "@/lib/store";
 import { ProductCard } from "@/components/product/ProductCard";
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/wishlist")({
 function WishlistPage() {
   const ids = useWishlist(s => s.ids);
   const hydrated = useHydrated();
-  const items = PRODUCTS.filter(p => ids.includes(p.id));
+  const items = PRODUCTS.filter(p => ids.includes(p.id)).map(toDBProduct);
 
   return (
     <div className="pt-24 md:pt-28 container-edge pb-24">

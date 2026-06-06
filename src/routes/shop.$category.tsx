@@ -1,6 +1,8 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { byCategory, CATEGORIES, type Category } from "@/lib/products";
+import { useQuery } from "@tanstack/react-query";
+import { CATEGORIES } from "@/lib/products";
 import { ProductCard } from "@/components/product/ProductCard";
+import { listProducts } from "@/lib/products.functions";
 
 export const Route = createFileRoute("/shop/$category")({
   loader: ({ params }) => {
@@ -32,7 +34,11 @@ export const Route = createFileRoute("/shop/$category")({
 
 function CategoryPage() {
   const { cat } = Route.useLoaderData();
-  const items = byCategory(cat.slug as Category);
+  const { data, isLoading } = useQuery({
+    queryKey: ["products", "category", cat.slug],
+    queryFn: () => listProducts({ data: { category: cat.slug, page: 1, perPage: 60, sort: "new" } }),
+  });
+  const items = data?.items ?? [];
   return (
     <div className="pt-24 md:pt-28">
       <section className="relative h-[44vh] min-h-[320px] bg-ink text-paper overflow-hidden">
@@ -44,7 +50,9 @@ function CategoryPage() {
         </div>
       </section>
       <div className="container-edge py-14">
-        {items.length === 0 ? (
+        {isLoading ? (
+          <p className="font-display text-2xl text-center py-16 text-muted-foreground">Loading…</p>
+        ) : items.length === 0 ? (
           <p className="font-display text-3xl text-center py-16">Coming soon.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-10">
