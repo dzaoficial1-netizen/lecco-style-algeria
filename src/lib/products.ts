@@ -64,6 +64,26 @@ export function productImage(p: Pick<DBProduct, "image_urls" | "category">): str
   return p.image_urls?.[0] ?? categoryImage(p.category);
 }
 
+/** Adapt a legacy mock `Product` into the `DBProduct` shape used by ProductCard. */
+export function toDBProduct(p: Product): DBProduct {
+  return {
+    id: p.id,
+    slug: p.slug,
+    title: p.name,
+    description: null,
+    category: p.category,
+    price: p.price,
+    compare_at_price: p.compareAt ?? null,
+    stock: 99,
+    image_urls: [p.image],
+    colors: p.colors,
+    sizes: p.sizes,
+    tagline: p.tagline ?? null,
+    is_new: !!p.isNew,
+    is_active: true,
+  };
+}
+
 const APPAREL_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const SHOE_SIZES = ["40", "41", "42", "43", "44", "45"];
 const HAT_SIZE = ["One Size"];
