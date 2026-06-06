@@ -34,6 +34,27 @@ export const isAdmin = createServerFn({ method: "POST" })
     return { isAdmin: !!data };
   });
 
+/**
+ * Bootstrap: if no admin exists yet, promote the current user.
+ * Safe to call any time — becomes a no-op once an admin exists.
+ */
+export const claimAdminIfFirst = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { count, error: cErr } = await supabaseAdmin
+      .from("user_roles")
+      .select("id", { count: "exact", head: true })
+      .eq("role", "admin");
+    if (cErr) throw new Error(cErr.message);
+    if ((count ?? 0) > 0) return { claimed: false };
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: context.userId, role: "admin" });
+    if (error) throw new Error(error.message);
+    return { claimed: true };
+  });
+
 export const adminUpsertProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => ProductInput.parse(input))
